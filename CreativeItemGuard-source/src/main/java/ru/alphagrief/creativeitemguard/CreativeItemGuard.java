@@ -159,21 +159,62 @@ public final class CreativeItemGuard extends JavaPlugin implements Listener {
 
         int limit = Math.max(1, getConfig().getInt("punishments.warning-limit", 10));
         if (count >= limit && !privilegeRemoved.contains(player.getUniqueId())) {
-            String group = getConfig().getString("luckperms.remove-group", "").trim();
-            if (getConfig().getBoolean("luckperms.enabled", false) && !group.isEmpty()) {
-                String command = getConfig().getString("luckperms.remove-command",
-                        "lp user %player% parent remove " + group).replace("%player%", player.getName())
-                        .replace("%group%", group);
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-                privilegeRemoved.add(player.getUniqueId());
-                saveData();
-                player.sendMessage(color(getConfig().getString("messages.privilege-removed",
-                        "&cЗа достижение лимита предупреждений ваша привилегия снята.")));
+            if (getConfig().getBoolean("luckperms.enabled", false)) {
+                removeHighestDonorGroup(player);
             } else {
                 getLogger().warning("Достигнут лимит варнов у " + player.getName()
-                        + ", но снятие группы не выполнено: настройте luckperms.enabled и luckperms.remove-group.");
+                        + ", но LuckPerms-интеграция выключена.");
             }
         }
+    }
+
+    private void removeHighestDonorGroup(Player player) {
+        net.luckperms.api.LuckPerms luckPerms = getServer().getServicesManager()
+                .load(net.luckperms.api.LuckPerms.class);
+        if (luckPerms == null) {
+            getLogger().warning("LuckPerms API не найден. Не удалось определить группу " + player.getName());
+            return;
+        }
+        Set<String> excluded = new HashSet<>();
+        for (String name : getConfig().getStringList("luckperms.excluded-groups"))
+            excluded.add(name.toLowerCase(Locale.ROOT));
+
+        UUID uuid = player.getUniqueId();
+        luckPerms.getUserManager().loadUser(uuid).thenAccept(user -> {
+            String selected = null;
+            int highestWeight = Integer.MIN_VALUE;
+            for (net.luckperms.api.node.Node node : user.getNodes()) {
+                if (!(node instanceof net.luckperms.api.node.types.InheritanceNode inheritance)) continue;
+                String groupName = inheritance.getGroupName();
+                if (excluded.contains(groupName.toLowerCase(Locale.ROOT))) continue;
+                net.luckperms.api.model.group.Group group = luckPerms.getGroupManager().getGroup(groupName);
+                if (group == null) continue;
+                int weight = group.getWeight().orElse(0);
+                if (weight > highestWeight) {
+                    highestWeight = weight;
+                    selected = groupName;
+                }
+            }
+            String groupToRemove = selected;
+            Bukkit.getScheduler().runTask(this, () -> {
+                if (groupToRemove == null) {
+                    getLogger().warning("У " + player.getName() + " не найдена донатная группа для снятия.");
+                    return;
+                }
+                String cmd = "lp user " + player.getName() + " parent remove " + groupToRemove;
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                privilegeRemoved.add(uuid);
+                saveData();
+                player.sendMessage(color(getConfig().getString("messages.privilege-removed",
+                        "&cЗа достижение лимита предупреждений ваша высшая донатная привилегия снята.")));
+                getLogger().info("Снята группа " + groupToRemove + " у " + player.getName()
+                        + " (10+ предупреждений CreativeItemGuard).");
+            });
+        }).exceptionally(error -> {
+            getLogger().warning("Не удалось загрузить данные LuckPerms для " + player.getName()
+                    + ": " + error.getMessage());
+            return null;
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
