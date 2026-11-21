@@ -116,11 +116,16 @@ litebans:
   enabled: false
   warn-command: "litebans:warn %player% Нарушение CreativeItemGuard: %reason%"
 
-# LuckPerms: снимается ТОЛЬКО указанная группа, не используйте 'clear'.
+# LuckPerms: автоматически снимается группа с наибольшим весом.
+# Защищённые группы никогда не снимаются — укажите здесь все staff/системные группы.
 luckperms:
-  enabled: false
-  remove-group: "donator"
-  remove-command: "lp user %player% parent remove %group%"
+  enabled: true
+  excluded-groups:
+    - default
+    - owner
+    - admin
+    - moderator
+    - helper
 
 messages:
   blocked: "&cЭтот предмет запрещён в креативе!"
