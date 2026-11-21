@@ -1,0 +1,17 @@
+name: CreativeItemGuard
+version: 1.0.0
+main: ru.alphagrief.creativeitemguard.CreativeItemGuard
+api-version: '1.21'
+author: AlphaGrief
+description: Ограничивает предметы, которые игрок может брать в креативе и подбирать.
+commands:
+  cig:
+    description: Управление CreativeItemGuard
+    usage: /cig reload
+    permission: creativeitemguard.admin
+permissions:
+  creativeitemguard.admin:
+    default: op
+  creativeitemguard.bypass:
+    description: Игнорировать ограничения предметов
+    default: op

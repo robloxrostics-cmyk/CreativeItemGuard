@@ -1,0 +1,25 @@
+# Режим списка:
+# BLACKLIST — запрещённые предметы из списка ниже.
+# WHITELIST — разрешены ТОЛЬКО предметы из списка ниже.
+mode: BLACKLIST
+
+# Ограничивать только игроков в креативе.
+creative-only: true
+
+# Запрещённые/разрешённые материалы.
+# Названия — Bukkit Material, в верхнем регистре.
+items:
+  - BEDROCK
+  - COMMAND_BLOCK
+  - CHAIN_COMMAND_BLOCK
+  - REPEATING_COMMAND_BLOCK
+  - STRUCTURE_BLOCK
+  - STRUCTURE_VOID
+  - BARRIER
+  - JIGSAW
+  - DEBUG_STICK
+  - KNOWLEDGE_BOOK
+
+messages:
+  blocked: "&cЭтот предмет запрещён в креативе!"
+  reloaded: "&aКонфигурация CreativeItemGuard перезагружена."
