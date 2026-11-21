@@ -2,6 +2,7 @@ name: CreativeItemGuard
 version: 2.0.0
 main: ru.alphagrief.creativeitemguard.CreativeItemGuard
 api-version: '1.21'
+softdepend: [LuckPerms, LiteBans]
 author: AlphaGrief
 description: Защита креатива, ограничения предметов и персональные блокировки.
 commands:
