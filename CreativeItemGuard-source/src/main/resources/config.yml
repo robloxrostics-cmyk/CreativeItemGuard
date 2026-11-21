@@ -1,13 +1,8 @@
-# Режим списка:
-# BLACKLIST — запрещённые предметы из списка ниже.
-# WHITELIST — разрешены ТОЛЬКО предметы из списка ниже.
+# CreativeItemGuard Ultimate - AlphaGrief
 mode: BLACKLIST
-
-# Ограничивать только игроков в креативе.
 creative-only: true
 
-# Запрещённые/разрешённые материалы.
-# Названия — Bukkit Material, в верхнем регистре.
+# Блокируемые предметы. Шалкеры всех цветов блокируются отдельно.
 items:
   - BEDROCK
   - COMMAND_BLOCK
@@ -19,7 +14,119 @@ items:
   - JIGSAW
   - DEBUG_STICK
   - KNOWLEDGE_BOOK
+  - WOODEN_SWORD
+  - STONE_SWORD
+  - IRON_SWORD
+  - GOLDEN_SWORD
+  - DIAMOND_SWORD
+  - NETHERITE_SWORD
+  - LEATHER_HELMET
+  - LEATHER_CHESTPLATE
+  - LEATHER_LEGGINGS
+  - LEATHER_BOOTS
+  - CHAINMAIL_HELMET
+  - CHAINMAIL_CHESTPLATE
+  - CHAINMAIL_LEGGINGS
+  - CHAINMAIL_BOOTS
+  - IRON_HELMET
+  - IRON_CHESTPLATE
+  - IRON_LEGGINGS
+  - IRON_BOOTS
+  - GOLDEN_HELMET
+  - GOLDEN_CHESTPLATE
+  - GOLDEN_LEGGINGS
+  - GOLDEN_BOOTS
+  - DIAMOND_HELMET
+  - DIAMOND_CHESTPLATE
+  - DIAMOND_LEGGINGS
+  - DIAMOND_BOOTS
+  - NETHERITE_HELMET
+  - NETHERITE_CHESTPLATE
+  - NETHERITE_LEGGINGS
+  - NETHERITE_BOOTS
+  - TURTLE_HELMET
+  - GOLDEN_APPLE
+  - ENCHANTED_GOLDEN_APPLE
+  - ELYTRA
+  - TOTEM_OF_UNDYING
+  - TRIDENT
+  - SHIELD
+  - BOW
+  - CROSSBOW
+  - TNT
+  - TNT_MINECART
+  - FLINT_AND_STEEL
+  - FIRE_CHARGE
+  - FIREWORK_ROCKET
+  - LAVA_BUCKET
+  - SPAWNER
+  - END_PORTAL_FRAME
+  - END_PORTAL
+  - NETHER_PORTAL
+  - COMMAND_BLOCK_MINECART
+  - REDSTONE
+  - REDSTONE_BLOCK
+  - REDSTONE_TORCH
+  - REDSTONE_WIRE
+  - REPEATER
+  - COMPARATOR
+  - OBSERVER
+  - PISTON
+  - STICKY_PISTON
+  - PISTON_HEAD
+  - DISPENSER
+  - DROPPER
+  - HOPPER
+  - TARGET
+  - DAYLIGHT_DETECTOR
+  - TNT
+  - LEVER
+  - STONE_BUTTON
+  - OAK_BUTTON
+  - STONE_PRESSURE_PLATE
+  - LIGHT_WEIGHTED_PRESSURE_PLATE
+  - HEAVY_WEIGHTED_PRESSURE_PLATE
+  - TRIPWIRE_HOOK
+  - TRIPWIRE
+  - SCULK_SENSOR
+  - CALIBRATED_SCULK_SENSOR
+  - SCULK_SHRIEKER
+
+# Защита контейнеров и верстака (в креативе).
+containers:
+  block-open: true
+  block-break: true
+  block-types:
+    - CHEST
+    - TRAPPED_CHEST
+    - ENDER_CHEST
+    - BARREL
+  block-crafting-table: true
+  block-shulkers: true
+  block-drop: true
+
+# Нарушения и предупреждения. Счётчик хранится в plugins/CreativeItemGuard/data.yml.
+punishments:
+  warning-limit: 10
+  violation-cooldown-seconds: 3
+  notify-admins: true
+
+# LiteBans: команда выполняется от консоли. Проверьте синтаксис warn для вашей версии LiteBans.
+litebans:
+  enabled: false
+  warn-command: "litebans:warn %player% Нарушение CreativeItemGuard: %reason%"
+
+# LuckPerms: снимается ТОЛЬКО указанная группа, не используйте 'clear'.
+luckperms:
+  enabled: false
+  remove-group: "donator"
+  remove-command: "lp user %player% parent remove %group%"
 
 messages:
   blocked: "&cЭтот предмет запрещён в креативе!"
   reloaded: "&aКонфигурация CreativeItemGuard перезагружена."
+  warning: "&cПредупреждение за нарушение! &7(%count%/%limit%)"
+  admin-violation: "&8[&6CIG&8] &e%player% &7: &f%reason%"
+  creative-disabled: "&cВаши возможности креатива ограничены администрацией. Полёт доступен."
+  creative-enabled: "&aОграничения креатива сняты."
+  privilege-removed: "&cЗа достижение лимита предупреждений ваша привилегия снята."
