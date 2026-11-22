@@ -1,0 +1,22 @@
+name: CreativeItemGuard
+version: 2.1.0
+main: ru.alphagrief.creativeitemguard.CreativeItemGuard
+api-version: '1.21'
+softdepend: [WorldEdit, LuckPerms, LiteBans]
+author: AlphaGrief
+description: Защита креатива, ограничения предметов и персональные блокировки.
+commands:
+  cig:
+    description: Управление CreativeItemGuard
+    usage: /cig <reload|disable|enable|status|disabled>
+    permission: creativeitemguard.admin
+permissions:
+  creativeitemguard.admin:
+    description: Управление CreativeItemGuard
+    default: op
+  creativeitemguard.bypass:
+    description: Игнорировать ограничения CreativeItemGuard
+    default: op
+  creativeitemguard.notify:
+    description: Получать уведомления о нарушениях
+    default: op
