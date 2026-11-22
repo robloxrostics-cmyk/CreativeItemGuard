@@ -263,8 +263,8 @@ public final class CreativeItemGuard extends JavaPlugin implements Listener {
 
             event.setExtent(new com.sk89q.worldedit.extent.AbstractDelegateExtent(event.getExtent()) {
                 @Override
-                public boolean setBlock(com.sk89q.worldedit.math.BlockVector3 position,
-                                        com.sk89q.worldedit.world.block.BlockStateHolder<?> block)
+                public <T extends com.sk89q.worldedit.world.block.BlockStateHolder<T>> boolean setBlock(
+                        com.sk89q.worldedit.math.BlockVector3 position, T block)
                         throws com.sk89q.worldedit.WorldEditException {
                     Material material = worldEditMaterial(block.getBlockType());
 
