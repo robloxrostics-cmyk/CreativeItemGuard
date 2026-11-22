@@ -1,4 +1,7 @@
 # CreativeItemGuard Ultimate - AlphaGrief
+worldedit:
+  enabled: true
+
 mode: BLACKLIST
 creative-only: true
 
