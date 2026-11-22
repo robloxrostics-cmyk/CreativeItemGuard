@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -45,6 +46,15 @@ public final class CreativeItemGuard extends JavaPlugin implements Listener {
         loadData();
         loadSettings();
         getServer().getPluginManager().registerEvents(this, this);
+
+        if (getServer().getPluginManager().isPluginEnabled("WorldEdit")
+                && getConfig().getBoolean("worldedit.enabled", true)) {
+            com.sk89q.worldedit.WorldEdit.getInstance().getEventBus().register(new WorldEditListener());
+            getLogger().info("WorldEdit protection enabled.");
+        } else {
+            getLogger().info("WorldEdit not found or protection disabled; WorldEdit protection is inactive.");
+        }
+
         getLogger().info("CreativeItemGuard enabled.");
     }
 
@@ -215,6 +225,64 @@ public final class CreativeItemGuard extends JavaPlugin implements Listener {
                     + ": " + error.getMessage());
             return null;
         });
+    }
+
+    private boolean isRestrictedBlock(Player player, Material material) {
+        if (material.isAir()) return false;
+        if (player.hasPermission("creativeitemguard.bypass")) return false;
+        if (!isCreativeScope(player)) return false;
+        if (getConfig().getBoolean("containers.block-shulkers", true)
+                && isShulker(material)) return true;
+
+        boolean listed = configuredItems.contains(material);
+        return mode.equals("BLACKLIST") ? listed : !listed;
+    }
+
+    private Material worldEditMaterial(com.sk89q.worldedit.world.block.BlockType blockType) {
+        if (blockType == null) return Material.AIR;
+        String id = blockType.getId();
+        if (id.startsWith("minecraft:")) id = id.substring("minecraft:".length());
+        Material material = Material.matchMaterial(id.toUpperCase(Locale.ROOT));
+        return material == null ? Material.AIR : material;
+    }
+
+    /**
+     * Separate class keeps WorldEdit optional: this class is only loaded when WorldEdit is installed.
+     */
+    private final class WorldEditListener {
+        @com.sk89q.worldedit.util.eventbus.Subscribe
+        public void onWorldEditSession(com.sk89q.worldedit.event.extent.EditSessionEvent event) {
+            if (!getConfig().getBoolean("worldedit.enabled", true)) return;
+            if (event.getStage() != com.sk89q.worldedit.EditSession.Stage.BEFORE_CHANGE
+                    && event.getStage() != com.sk89q.worldedit.EditSession.Stage.BEFORE_HISTORY) return;
+
+            if (!(event.getActor() instanceof com.sk89q.worldedit.entity.Player worldEditPlayer)) return;
+            Player player = Bukkit.getPlayer(worldEditPlayer.getUniqueId());
+            if (player == null || player.hasPermission("creativeitemguard.bypass")) return;
+            if (!isCreativeScope(player)) return;
+
+            event.setExtent(new com.sk89q.worldedit.extent.AbstractDelegateExtent(event.getExtent()) {
+                @Override
+                public boolean setBlock(com.sk89q.worldedit.math.BlockVector3 position,
+                                        com.sk89q.worldedit.world.block.BlockStateHolder<?> block)
+                        throws com.sk89q.worldedit.WorldEditException {
+                    Material material = worldEditMaterial(block.getBlockType());
+
+                    if (isDisabled(player)) {
+                        violation(player, "Попытка использовать WorldEdit при отключённом креативе");
+                        return false;
+                    }
+
+                    if (isRestrictedBlock(player, material)) {
+                        violation(player, "Попытка установить запрещённый блок через WorldEdit: "
+                                + material.name());
+                        return false;
+                    }
+
+                    return super.setBlock(position, block);
+                }
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
